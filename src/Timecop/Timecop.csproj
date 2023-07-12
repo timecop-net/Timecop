@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<PackageId>Timecop</PackageId>
 		<Description>Easy date and time testing in C#.</Description>
-		<Authors>Dmytri Khmara</Authors>
+		<Authors>Dmytro Khmara</Authors>
 		<Copyright>Copyright Dmytro Khmara</Copyright>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>DateTime;Date;Time;Unit;Testing;</PackageTags>
@@ -26,7 +26,7 @@
 	</Target>
 
 	<ItemGroup>
-		<None Include="..\..\README.md" Pack="true" PackagePath=""/>
+		<None Include="..\..\README.md" Pack="true" PackagePath="" />
 		<!--<None Include="..\..\icon.png" Pack="true" PackagePath="" />-->
 
 		<PackageReference Include="MinVer" Version="4.3.0">
