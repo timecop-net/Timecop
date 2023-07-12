@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TCop;
+namespace TCop.DateTimeUtils;
 
 public struct UtcDateTime
 {
@@ -14,12 +14,5 @@ public struct UtcDateTime
         }
 
         UtcValue = value.ToUniversalTime();
-    }
-}
-
-public class InvalidDateTimeKindException : Exception
-{
-    public InvalidDateTimeKindException(): base("DateTimeKind.Unspecified is not supported. Use DateTimeKind.Utc or DateTimeKind.Local.")
-    {
     }
 }

@@ -62,7 +62,7 @@ namespace TCop.Tests
                     {
                         tc2.TravelBy(TimeSpan.FromMinutes(20));
 
-                        tc2.Unfreeze();
+                        tc2.Resume();
 
                         await Task.Delay(500);
 

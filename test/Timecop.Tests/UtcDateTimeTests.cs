@@ -1,6 +1,5 @@
-﻿using System.Data.SqlTypes;
-using FluentAssertions;
-using TCop;
+﻿using FluentAssertions;
+using TCop.DateTimeUtils;
 
 namespace TCop.Tests;
 
