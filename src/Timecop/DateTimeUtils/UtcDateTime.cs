@@ -1,4 +1,5 @@
 ﻿using System;
+using TCop.Core;
 
 namespace TCop.DateTimeUtils;
 
@@ -15,4 +16,6 @@ public struct UtcDateTime
 
         UtcValue = value.ToUniversalTime();
     }
+
+    public PointInTime PointInTime => new (UtcValue);
 }
