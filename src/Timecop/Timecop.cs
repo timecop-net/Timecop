@@ -1,4 +1,5 @@
 ﻿using System;
+using TCop.Core;
 using TCop.DateTimeUtils;
 
 namespace TCop;
@@ -7,7 +8,7 @@ public class Timecop : IDisposable
 {
     private readonly TimecopContextStore _contextStore = new();
 
-    public static DateTime UtcNow => TimecopContextStore.AsyncContextUtcNow;
+    public static DateTime UtcNow => TimecopContextStore.AsyncContextUtcNow.DateTime;
 
     /// <summary>Moves in time backward or forward by the specified amount of time.</summary>
     /// <param name="duration">The amount of time to travel by. Can be positive or negative.</param>
@@ -18,7 +19,7 @@ public class Timecop : IDisposable
 
     private void ConvertAndFreeze(UtcDateTime? utcDateTime)
     {
-        _contextStore.Mutate((ref TimecopContext context, DateTime utcNow) => context.Freeze(utcDateTime?.UtcValue ?? utcNow));
+        _contextStore.Mutate((ref TimecopContext context, PointInTime utcNow) => context.Freeze(utcDateTime?.PointInTime ?? utcNow));
     }
 
     /// <summary>Freezes an instance of <see cref="T:TCop.Timecop" /> at the current time.</summary>
@@ -80,7 +81,7 @@ public class Timecop : IDisposable
     /// <summary>Resumes the flow of time of a frozen instance of <see cref="T:TCop.Timecop" />.</summary>
     public void Resume()
     {
-        _contextStore.Mutate((ref TimecopContext context, DateTime utcNow) => context.Unfreeze(utcNow));
+        _contextStore.Mutate((ref TimecopContext context, PointInTime utcNow) => context.Unfreeze(utcNow));
     }
 
     /// <summary>Creates an instance of <see cref="T:TCop.Timecop" /> and freezes it at the current time.</summary>
