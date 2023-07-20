@@ -1,6 +1,5 @@
 # Timecop - Easy Date and Time Testing in C\#
 
-
 Timecop is a small library that helps you test DateTime in a static, thread-safe, ambient context.
 
 Timecop targets .NET Standard 2.0, has no external dependencies, and can be used with .NET Framework 4.5+ and any version of .NET and .NET Core.
@@ -48,9 +47,9 @@ Greet(); // Good evening!
 
 ### Freezing and resuming time
 
-Time is frozen with either an instance `Freeze` or a static `Frozen` method, both having the same set of signatures. The instance `Freeze` freezes the instance of `Timecop`, the static `Frozen` creates an already frozen instance.
+You can freeze the time so that it stops running for your tests until you call `Resume` or dispose the `Timecop` instance.
 
-Frozen time doesn't run for your tests until you call `Resume` or dispose the `Timecop` instance:
+You freeze time with either an instance `Freeze` or a static `Frozen` method, which both have the same set of overloads. Both methods have the same effect, however the static `Frozen` creates an already frozen `Timecop` instance.
 
 ```csharp
 using var tc = Timecop.Frozen(1990, 12, 2, 14, 38, 51, DateTimeKind.Local);
@@ -68,23 +67,23 @@ Thread.Sleep(TimeSpan.FromSeconds(3));
 Clock.Now; // 1990-12-02 14:38:54 - time has changed
 ```
 
-Both `Freeze` and `Frozen` have multiple overloads:
+`Freeze` and `Frozen` have multiple overloads:
 
 ```csharp
 // freeze at the current instant:
-tc.Freeze();
+var frozenAt = tc.Freeze();
 
 // freeze at the specified DateTime:
-tc.Freeze(new DateTime(1990, 12, 2, 14, 38, 51, DateTimeKind.Utc));
+frozenAt = tc.Freeze(new DateTime(1990, 12, 2, 14, 38, 51, DateTimeKind.Utc));
 
 // freeze at the specified date and time:
-tc.Freeze(1990, 12, 2, 14, 38, 51, DateTimeKind.Utc);
+frozenAt = tc.Freeze(1990, 12, 2, 14, 38, 51, DateTimeKind.Utc);
 
 // freeze at the specified date:
-tc.Freeze(1990, 12, 2, DateTimeKind.Utc);
+frozenAt = tc.Freeze(1990, 12, 2, DateTimeKind.Utc);
 
-// freeze at the specified date or time or both:
-tc.Freeze(o => o.On(1990, 12, 2)
+// freeze at the specified date or time using a builder:
+frozenAt = tc.Freeze(o => o.On(1990, 12, 2)
                 .At(14, 13, 51)
                 .LocalTime());
 ```
