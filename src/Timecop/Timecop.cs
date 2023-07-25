@@ -1,8 +1,8 @@
 ﻿using System;
 using TCop.Core;
 using TCop.Core.Context;
-using TCop.Core.Time;
-using TCop.Core.Time.Builder;
+using TCop.Time;
+using TCop.Time.Builder;
 
 namespace TCop;
 
