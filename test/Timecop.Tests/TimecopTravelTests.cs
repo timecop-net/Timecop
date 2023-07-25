@@ -4,8 +4,6 @@ namespace TCop.Tests
 {
     public class TimecopTravelTests
     {
-        private static readonly TimeSpan DateTimeComparisonPrecision = TimeSpan.FromMilliseconds(50);
-
         [Fact]
         public void TravelBy_InFrozenState_ShouldFreezeAndTravel_AndReturnCurrentUtcTime()
         {
