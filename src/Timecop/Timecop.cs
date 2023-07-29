@@ -11,12 +11,7 @@ public class Timecop : IDisposable
     private readonly TimecopContextStore _contextStore = new();
 
     public static DateTime UtcNow => TimecopContextStore.AsyncContextUtcNow.DateTimeUtc;
-
-    private PointInTime ConvertAndFreeze(LocalOrUtcDateTime? utcDateTime)
-    {
-        return _contextStore.Mutate((ref TimecopContext context, PointInTime utcNow) => context.Freeze(utcDateTime?.PointInTime ?? utcNow));
-    }
-
+    
     private static DateTime ConvertToSpecificKind(DateTime dateTime, DateTimeKind kind)
     {
         if (kind == DateTimeKind.Utc)
@@ -27,33 +22,33 @@ public class Timecop : IDisposable
 
     /// <summary>Moves in time backward or forward by the specified amount of time.</summary>
     /// <param name="duration">The amount of time to travel by. Can be positive or negative.</param>
-    /// <returns>The UTC date and time the <see cref="T:TCop.Timecop" /> instance has traveled to.</returns>
+    /// <returns>The UTC date and time the time has traveled to.</returns>
     public DateTime TravelBy(TimeSpan duration)
     {
-        return _contextStore.Mutate((ref TimecopContext context) => context.TravelBy(duration)).DateTimeUtc;
+        return _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.TravelBy(duration, realNow)).DateTimeUtc;
     }
 
 
-    /// <summary>Freezes an instance of <see cref="T:TCop.Timecop" /> at the current time.</summary>
-    /// <returns>The UTC date and time the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
+    /// <summary>Freezes the time at the current moment.</summary>
+    /// <returns>The UTC date and time the time was frozen at.</returns>
     public DateTime Freeze()
     {
-        return ConvertAndFreeze(null).DateTimeUtc;
+        return _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.Freeze(realNow)).DateTimeUtc;
     }
 
-    /// <summary>Freezes an instance of <see cref="T:TCop.Timecop" /> at the specified local or UTC time.</summary>
-    /// <param name="freezeAt">The time to freeze at. Must represent either local or UTC time.</param>
-    /// <returns>The date and time with the same kind as <paramref name="freezeAt" /> that the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
-    /// <exception cref="T:TCop.Core.Time.InvalidDateTimeKindException">
-    ///     <paramref name="freezeAt" /> has the kind of Unspecified.
+    /// <summary>Freezes the time at the specified local or UTC date and time.</summary>
+    /// <param name="destination">The date and time to freeze at. Must represent either local or UTC time.</param>
+    /// <returns>The date and time with the same kind as <paramref name="destination" /> that the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
+    ///     <paramref name="destination" /> has the kind of Unspecified.
     /// </exception>
-    public DateTime Freeze(DateTime freezeAt)
+    public DateTime Freeze(DateTime destination)
     {
-        var frozenAt = ConvertAndFreeze(new LocalOrUtcDateTime(freezeAt));
-        return ConvertToSpecificKind(frozenAt.DateTimeUtc, freezeAt.Kind);
+        var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.FreezeAt(new LocalOrUtcDateTime(destination).PointInTime, realNow));
+        return ConvertToSpecificKind(frozenAt.DateTimeUtc, destination.Kind);
     }
 
-    /// <summary>Freezes an instance of <see cref="T:TCop.Timecop" /> at the specified local or UTC time.</summary>
+    /// <summary>Freezes the time at the specified local or UTC time.</summary>
     /// <param name="year">The year (1 through 9999).</param>
     /// <param name="month">The month (1 through 12).</param>
     /// <param name="day">The day (1 through the number of days in <paramref name="month" />).</param>
@@ -61,8 +56,8 @@ public class Timecop : IDisposable
     /// <param name="minute">The minutes (0 through 59).</param>
     /// <param name="second">The seconds (0 through 59).</param>
     /// <param name="kind">One of the enumeration values that indicates whether <paramref name="year" />, <paramref name="month" />, <paramref name="day" />, <paramref name="hour" />, <paramref name="minute" /> and <paramref name="second" /> specify a local time, Coordinated Universal Time (UTC), or neither.</param>
-    /// <returns>The date and time with the kind of <paramref name="kind" /> that the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
-    /// <exception cref="T:TCop.Core.Time.InvalidDateTimeKindException">
+    /// <returns>The date and time with the kind of <paramref name="kind" /> that the time was frozen at.</returns>
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
     ///     <paramref name="kind" /> has the kind of Unspecified.
     /// </exception>
     public DateTime Freeze(int year, int month, int day, int hour, int minute, int second, DateTimeKind kind)
@@ -70,13 +65,13 @@ public class Timecop : IDisposable
         return Freeze(new DateTime(year, month, day, hour, minute, second, kind));
     }
 
-    /// <summary>Freezes an instance of <see cref="T:TCop.Timecop" /> at the specified local or UTC time.</summary>
+    /// <summary>Freezes the time at midnight at the provided date.</summary>
     /// <param name="year">The year (1 through 9999).</param>
     /// <param name="month">The month (1 through 12).</param>
     /// <param name="day">The day (1 through the number of days in <paramref name="month" />).</param>
     /// <param name="kind">One of the enumeration values that indicates whether <paramref name="year" />, <paramref name="month" />, <paramref name="day" />, <paramref name="hour" />, <paramref name="minute" /> and <paramref name="second" /> specify a local time, Coordinated Universal Time (UTC), or neither.</param>
     /// <returns>The date and time with the kind of <paramref name="kind" /> that the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
-    /// <exception cref="T:TCop.Core.Time.InvalidDateTimeKindException">
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
     ///     <paramref name="kind" /> has the kind of Unspecified.
     /// </exception>
     public DateTime Freeze(int year, int month, int day, DateTimeKind kind)
@@ -84,13 +79,13 @@ public class Timecop : IDisposable
         return Freeze(new DateTime(year, month, day, 0, 0, 0, kind));
     }
 
-    /// <summary>Freezes an instance of <see cref="T:TCop.Timecop" /> at the specified local or UTC time.</summary>
-    /// <param name="config">The function to configure the time to freeze at.</param>
-    /// <returns>The date and time with the kind of specified in <paramref name="config" /> that the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
-    public DateTime Freeze(Action<PointInTimeBuilder> config)
+    /// <summary>Freezes the time at the specified local or UTC date and time.</summary>
+    /// <param name="configureDestination">The function to configure the date and time to freeze at.</param>
+    /// <returns>The date and time with the kind of specified in <paramref name="configureDestination" /> that the <see cref="T:TCop.Timecop" /> instance was frozen at.</returns>
+    public DateTime Freeze(Action<PointInTimeBuilder> configureDestination)
     {
         var builder = new PointInTimeBuilder();
-        config(builder);
+        configureDestination(builder);
         var frozenAt = Freeze(builder.Build(out var kind).DateTimeUtc);
         return ConvertToSpecificKind(frozenAt, kind);
     }
@@ -114,7 +109,7 @@ public class Timecop : IDisposable
     /// <summary>Creates an instance of <see cref="T:TCop.Timecop" /> and freezes it at the specified local or UTC time.</summary>
     /// <param name="frozenAt">The time to freeze at. Must represent either local or UTC time.</param>
     /// <returns>A frozen <see cref="T:TCop.Timecop" /> instance.</returns>
-    /// <exception cref="T:TCop.DateTimeUtils.InvalidDateTimeKindException">
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
     ///     <paramref name="frozenAt" /> has the kind of Unspecified.
     /// </exception>
     public static Timecop Frozen(DateTime frozenAt)
@@ -133,7 +128,7 @@ public class Timecop : IDisposable
     /// <param name="second">The seconds (0 through 59).</param>
     /// <param name="kind">One of the enumeration values that indicates whether <paramref name="year" />, <paramref name="month" />, <paramref name="day" />, <paramref name="hour" />, <paramref name="minute" /> and <paramref name="second" /> specify a local time, Coordinated Universal Time (UTC), or neither.</param>
     /// <returns>A frozen <see cref="T:TCop.Timecop" /> instance.</returns>
-    /// <exception cref="T:TCop.DateTimeUtils.InvalidDateTimeKindException">
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
     ///     <paramref name="kind" /> has the kind of Unspecified.
     /// </exception>
     public static Timecop Frozen(int year, int month, int day, int hour, int minute, int second, DateTimeKind kind)
@@ -149,7 +144,7 @@ public class Timecop : IDisposable
     /// <param name="day">The day (1 through the number of days in <paramref name="month" />).</param>
     /// <param name="kind">One of the enumeration values that indicates whether <paramref name="year" />, <paramref name="month" />, <paramref name="day" />, <paramref name="hour" />, <paramref name="minute" /> and <paramref name="second" /> specify a local time, Coordinated Universal Time (UTC), or neither.</param>
     /// <returns>A frozen <see cref="T:TCop.Timecop" /> instance.</returns>
-    /// <exception cref="T:TCop.DateTimeUtils.InvalidDateTimeKindException">
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
     ///     <paramref name="kind" /> has the kind of Unspecified.
     /// </exception>
     public static Timecop Frozen(int year, int month, int day, DateTimeKind kind)
@@ -172,5 +167,59 @@ public class Timecop : IDisposable
     public void Dispose()
     {
         _contextStore.ResetContext();
+    }
+
+    /// <summary>Moves the time to the given local or UTC date and time.</summary>
+    /// <param name="destination">The instant to travel to. Must represent either local or UTC time.</param>
+    /// <returns>The date and time with the same kind as <paramref name="destination" /> that the time has traveled to.</returns>
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
+    ///     <paramref name="destination" /> has the kind of Unspecified.
+    /// </exception>
+    public DateTime TravelTo(DateTime destination)
+    {
+        var frozenAt = _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.TravelTo(new LocalOrUtcDateTime(destination).PointInTime, realNow));
+        return ConvertToSpecificKind(frozenAt.DateTimeUtc, destination.Kind);
+    }
+
+    /// <summary>Moves the time to the given local or UTC date and time.</summary>
+    /// <param name="year">The year (1 through 9999).</param>
+    /// <param name="month">The month (1 through 12).</param>
+    /// <param name="day">The day (1 through the number of days in <paramref name="month" />).</param>
+    /// <param name="hour">The hours (0 through 23).</param>
+    /// <param name="minute">The minutes (0 through 59).</param>
+    /// <param name="second">The seconds (0 through 59).</param>
+    /// <param name="kind">One of the enumeration values that indicates whether <paramref name="year" />, <paramref name="month" />, <paramref name="day" />, <paramref name="hour" />, <paramref name="minute" /> and <paramref name="second" /> specify a local time, Coordinated Universal Time (UTC), or neither.</param>
+    /// <returns>The date and time with the kind of <paramref name="kind" /> that the time has traveled to.</returns>
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
+    ///     <paramref name="kind" /> has the kind of Unspecified.
+    /// </exception>
+    public DateTime TravelTo(int year, int month, int day, int hour, int minute, int second, DateTimeKind kind)
+    {
+        return TravelTo(new DateTime(year, month, day, hour, minute, second, kind));
+    }
+
+    /// <summary>Moves the time to the midnight at the given date.</summary>
+    /// <param name="year">The year (1 through 9999).</param>
+    /// <param name="month">The month (1 through 12).</param>
+    /// <param name="day">The day (1 through the number of days in <paramref name="month" />).</param>
+    /// <param name="kind">One of the enumeration values that indicates whether <paramref name="year" />, <paramref name="month" />, <paramref name="day" />, <paramref name="hour" />, <paramref name="minute" /> and <paramref name="second" /> specify a local time, Coordinated Universal Time (UTC), or neither.</param>
+    /// <returns>The date and time with the kind of <paramref name="kind" /> that the time has traveled to.</returns>
+    /// <exception cref="T:TCop.Time.InvalidDateTimeKindException">
+    ///     <paramref name="kind" /> has the kind of Unspecified.
+    /// </exception>
+    public DateTime TravelTo(int year, int month, int day, DateTimeKind kind)
+    {
+        return TravelTo(new DateTime(year, month, day, 0, 0, 0, kind));
+    }
+
+    /// <summary>Moves the time to the specified local or UTC date and time.</summary>
+    /// <param name="configureDestination">The function to configure the date and time to travel to.</param>
+    /// <returns>The date and time with the kind of specified in <paramref name="configureDestination" /> that the time has traveled to.</returns>
+    public DateTime TravelTo(Action<PointInTimeBuilder> configureDestination)
+    {
+        var builder = new PointInTimeBuilder();
+        configureDestination(builder);
+        var frozenAt = TravelTo(builder.Build(out var kind).DateTimeUtc);
+        return ConvertToSpecificKind(frozenAt, kind);
     }
 }
