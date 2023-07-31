@@ -10,8 +10,13 @@ public class Timecop : IDisposable
 {
     private readonly TimecopContextStore _contextStore = new();
 
-    public static DateTime UtcNow => TimecopContextStore.AsyncContextUtcNow.DateTimeUtc;
-    
+    public static DateTime UtcNow => TimecopContextStore.AsyncContextNow.DateTimeUtc;
+
+    public Timecop()
+    {
+        Clock = new TimecopClock(() => _contextStore.InstanceContextNow.DateTimeUtc);
+    }
+
     private static DateTime ConvertToSpecificKind(DateTime dateTime, DateTimeKind kind)
     {
         if (kind == DateTimeKind.Utc)
@@ -19,6 +24,11 @@ public class Timecop : IDisposable
 
         return dateTime.ToLocalTime();
     }
+
+    /// <summary>
+    /// Returns an <see cref="T:TCop.IClock" /> implementation that you can pass to your code in the tests.
+    /// </summary>
+    public IClock Clock { get; }
 
     /// <summary>Moves in time backward or forward by the specified amount of time.</summary>
     /// <param name="duration">The amount of time to travel by. Can be positive or negative.</param>
