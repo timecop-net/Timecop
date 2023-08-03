@@ -66,7 +66,7 @@ namespace TCop.Tests
         {
             using var tc = new Timecop();
 
-            var frozenAt = tc.Freeze(o => o.InTheFuture().LocalTime());
+            var frozenAt = tc.Freeze(o => o.InTheFuture().InLocalZone());
             var currentLocalTime = DateTime.Now;
 
             Thread.Sleep(100);

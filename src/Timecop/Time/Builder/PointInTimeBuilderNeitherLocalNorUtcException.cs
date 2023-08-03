@@ -4,7 +4,7 @@ namespace TCop.Time.Builder;
 
 public class PointInTimeBuilderNeitherLocalNorUtcException : Exception
 {
-    public PointInTimeBuilderNeitherLocalNorUtcException() : base($"Call either {nameof(PointInTimeBuilder.LocalTime)}() or {nameof(PointInTimeBuilder.UtcTime)}() when configuring the point in time.")
+    public PointInTimeBuilderNeitherLocalNorUtcException() : base($"Call either {nameof(PointInTimeBuilder.InLocalZone)}() or {nameof(PointInTimeBuilder.InUtc)}() when configuring the point in time.")
     {
     }
 }
