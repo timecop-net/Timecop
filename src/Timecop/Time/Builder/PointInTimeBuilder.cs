@@ -19,13 +19,13 @@ public class PointInTimeBuilder
         return this;
     }
 
-    public PointInTimeBuilder LocalTime()
+    public PointInTimeBuilder InLocalZone()
     {
         _context.Kind = DateTimeKind.Local;
         return this;
     }
 
-    public PointInTimeBuilder UtcTime()
+    public PointInTimeBuilder InUtc()
     {
         _context.Kind = DateTimeKind.Utc;
         return this;

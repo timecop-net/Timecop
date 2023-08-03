@@ -70,7 +70,7 @@ namespace TCop.Tests
         {
             using var tc = new Timecop();
 
-            var traveledTo = tc.TravelTo(o => o.InTheFuture().LocalTime());
+            var traveledTo = tc.TravelTo(o => o.InTheFuture().InLocalZone());
             var currentLocalTime = DateTime.Now;
 
             Thread.Sleep(100);

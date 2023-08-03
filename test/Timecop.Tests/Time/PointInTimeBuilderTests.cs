@@ -12,7 +12,7 @@ public class PointInTimeBuilderTests
     [Fact]
     public void LocalTime_ShouldReturnCurrentLocalTime()
     {
-        _builder.LocalTime();
+        _builder.InLocalZone();
 
         _builder.Build(out var kind).DateTimeUtc.ToLocalTime().Should().BeCloseTo(DateTime.Now, DateTimeComparisonPrecision);
         kind.Should().Be(DateTimeKind.Local);
@@ -21,7 +21,7 @@ public class PointInTimeBuilderTests
     [Fact]
     public void UtcTime_ShouldReturnCurrentUtcTime()
     {
-        _builder.UtcTime();
+        _builder.InUtc();
 
         _builder.Build(out var kind).DateTimeUtc.Should().BeCloseTo(DateTime.UtcNow, DateTimeComparisonPrecision);
         kind.Should().Be(DateTimeKind.Utc);
@@ -34,7 +34,7 @@ public class PointInTimeBuilderTests
 
         var build = () => _builder.Build(out _);
 
-        build.Should().Throw<PointInTimeBuilderNeitherLocalNorUtcException>().WithMessage("Call either LocalTime() or UtcTime() when configuring the point in time.");
+        build.Should().Throw<PointInTimeBuilderNeitherLocalNorUtcException>().WithMessage("Call either InLocalZone() or InUtc() when configuring the point in time.");
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class PointInTimeBuilderTests
 
         var build = () => _builder.Build(out _);
 
-        build.Should().Throw<PointInTimeBuilderNeitherLocalNorUtcException>().WithMessage("Call either LocalTime() or UtcTime() when configuring the point in time.");
+        build.Should().Throw<PointInTimeBuilderNeitherLocalNorUtcException>().WithMessage("Call either InLocalZone() or InUtc() when configuring the point in time.");
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class PointInTimeBuilderTests
     [Fact]
     public void InTheFuture_WithLocalTime_ShouldReturnPointOfTimeInTheFutureInLocalTime()
     {
-        _builder.InTheFuture().LocalTime();
+        _builder.InTheFuture().InLocalZone();
 
         _builder.Build(out var kind).DateTimeUtc.Should().BeAfter(DateTime.UtcNow);
         kind.Should().Be(DateTimeKind.Local);
@@ -79,7 +79,7 @@ public class PointInTimeBuilderTests
     {
         _builder
             .On(1990, 12, 2)
-            .LocalTime();
+            .InLocalZone();
 
         var now = DateTime.Now;
 
@@ -93,7 +93,7 @@ public class PointInTimeBuilderTests
     {
         _builder
             .At(14, 15, 30, 893)
-            .LocalTime();
+            .InLocalZone();
 
         var now = DateTime.Now;
 
