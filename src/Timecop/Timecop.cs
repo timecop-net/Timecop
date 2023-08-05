@@ -38,6 +38,45 @@ public class Timecop : IDisposable
         return _contextStore.Mutate((ref TimecopContext context, PointInTime realNow) => context.TravelBy(duration, realNow)).DateTimeUtc;
     }
 
+    /// <summary>Moves in time backward or forward by the specified amount of days.</summary>
+    /// <param name="days">The number of days to travel by. Can be positive or negative.</param>
+    /// <returns>The UTC date and time the time has traveled to.</returns>
+    public DateTime TravelDays(double days)
+    {
+        return TravelBy(TimeSpan.FromDays(days));
+    }
+
+    /// <summary>Moves in time backward or forward by the specified amount of hours.</summary>
+    /// <param name="hours">The number of hours to travel by. Can be positive or negative.</param>
+    /// <returns>The UTC date and time the time has traveled to.</returns>
+    public DateTime TravelHours(double hours)
+    {
+        return TravelBy(TimeSpan.FromHours(hours));
+    }
+
+    /// <summary>Moves in time backward or forward by the specified amount of minutes.</summary>
+    /// <param name="minutes">The number of minutes to travel by. Can be positive or negative.</param>
+    /// <returns>The UTC date and time the time has traveled to.</returns>
+    public DateTime TravelMinutes(double minutes)
+    {
+        return TravelBy(TimeSpan.FromMinutes(minutes));
+    }
+
+    /// <summary>Moves in time backward or forward by the specified amount of seconds.</summary>
+    /// <param name="seconds">The number of seconds to travel by. Can be positive or negative.</param>
+    /// <returns>The UTC date and time the time has traveled to.</returns>
+    public DateTime TravelSeconds(double seconds)
+    {
+        return TravelBy(TimeSpan.FromSeconds(seconds));
+    }
+
+    /// <summary>Moves in time backward or forward by the specified amount of milliseconds.</summary>
+    /// <param name="milliseconds">The number of milliseconds to travel by. Can be positive or negative.</param>
+    /// <returns>The UTC date and time the time has traveled to.</returns>
+    public DateTime TravelMilliseconds(double milliseconds)
+    {
+        return TravelBy(TimeSpan.FromMilliseconds(milliseconds));
+    }
 
     /// <summary>Freezes the time at the current moment.</summary>
     /// <returns>The UTC date and time the time was frozen at.</returns>

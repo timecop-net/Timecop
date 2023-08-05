@@ -18,6 +18,57 @@ namespace TCop.Tests
             traveledTo.Should().Be(frozenAt.AddDays(3));
         }
 
+
+        [Fact]
+        public void TravelDays_ShouldTravelByDays_AndReturnCurrentUtcTime()
+        {
+            using var tc = new Timecop();
+            var frozenAt = tc.Freeze();
+            var traveledTo = tc.TravelDays(3);
+
+            traveledTo.Should().Be(frozenAt.AddDays(3));
+        }
+
+        [Fact]
+        public void TravelHours_ShouldTravelByHours_AndReturnCurrentUtcTime()
+        {
+            using var tc = new Timecop();
+            var frozenAt = tc.Freeze();
+            var traveledTo = tc.TravelHours(3);
+
+            traveledTo.Should().Be(frozenAt.AddHours(3));
+        }
+
+        [Fact]
+        public void TravelMinutes_ShouldTravelByMinutes_AndReturnCurrentUtcTime()
+        {
+            using var tc = new Timecop();
+            var frozenAt = tc.Freeze();
+            var traveledTo = tc.TravelMinutes(3);
+
+            traveledTo.Should().Be(frozenAt.AddMinutes(3));
+        }
+
+        [Fact]
+        public void TravelSeconds_ShouldTravelBySeconds_AndReturnCurrentUtcTime()
+        {
+            using var tc = new Timecop();
+            var frozenAt = tc.Freeze();
+            var traveledTo = tc.TravelSeconds(3);
+
+            traveledTo.Should().Be(frozenAt.AddSeconds(3));
+        }
+
+        [Fact]
+        public void TravelMilliseconds_ShouldTravelByMilliseconds_AndReturnCurrentUtcTime()
+        {
+            using var tc = new Timecop();
+            var frozenAt = tc.Freeze();
+            var traveledTo = tc.TravelMilliseconds(3);
+
+            traveledTo.Should().Be(frozenAt.AddMilliseconds(3));
+        }
+
         [Fact]
         public void TravelToDateTime_ShouldTravelToSpecifiedDateTime_AndReturnThatDateTime()
         {
